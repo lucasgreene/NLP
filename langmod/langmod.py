@@ -4,6 +4,8 @@ import numpy as np
 
 
 def get_bigrams(filename):
+    ''' Gets the bigrams as well as adding in 
+    the sentence seperator &&& '''
     with open(filename) as File:
         lines = File.read().split('\n')
     lines = [line + ' &&&' for line in lines]
@@ -15,6 +17,7 @@ def get_bigrams(filename):
     return toks, bigrams
 
 def bigram_counts(bigrams):
+    ''' Puts the counts of the bigrams in dictary freq'''
     freq = {}
     for gram in bigrams:
         if gram in freq:
@@ -24,11 +27,13 @@ def bigram_counts(bigrams):
     return freq
 
 def get_unigrams(filename):
+    ''' Gets the unigrams'''
     with open(filename) as File:
         toks = File.read().split()
     return toks
 
 def unigram_counts(toks):
+    ''' Puts the unigram counts in freq'''
     freq = {}
     for word in toks:
         if word in freq:
@@ -38,6 +43,9 @@ def unigram_counts(toks):
     return freq
 
 def bi_prob(bigrams, bi_freq, beta, uni_freq, n_words, alpha):
+    ''' Using given beta and alpha parameters calculates the 
+    probability of a list of bigrams (representing a setence)
+    according to bigram language model'''
     n_types = len(uni_freq)
     prob = 0.0
     for gram in bigrams:
@@ -59,6 +67,9 @@ def bi_prob(bigrams, bi_freq, beta, uni_freq, n_words, alpha):
 
 
 def uni_prob(toks, freq, alpha, n_words):
+    ''' Using given alpha parameter calculates the probability
+    of a list of unigrams (representing a sentence) according
+    to unigram language model '''
     n_types = len(freq)
     prob = 0.0
     for gram in toks:
@@ -69,6 +80,9 @@ def uni_prob(toks, freq, alpha, n_words):
     return prob*-1
 
 def beta_opt(ho_toks, bi_freq, uni_freq, n_words, alpha):
+    ''' Optimizes beta parameter for bigram model using golden 
+    line search and held out log-probabiliy of new corpus. 
+    Uses a given alpha paremter to estimate unigram probabilities'''
     tol = 0.001
     phi = 2/(1+np.sqrt(5))
     a = 0.01
@@ -98,6 +112,8 @@ def beta_opt(ho_toks, bi_freq, uni_freq, n_words, alpha):
 
 
 def alpha_opt(ho_toks, freq, n_words):
+    ''' Optimizes alpha parameter for unigram model using golden
+    line search and held out log-probability of new corpus'''
     tol = 0.001
     phi = 2/(1+np.sqrt(5))
     a = 0.01
@@ -126,6 +142,10 @@ def alpha_opt(ho_toks, freq, n_words):
     return a
 
 def guess_sents_uni(filename, freq, alpha, n_words):
+    ''' Predicts the proper english sentence from improper 
+    sentence using unigram model. In the test file included 
+    in the package the a good sentence is on a single line
+    followed by the bad sentence on the next line '''
     with open(filename) as File:
         lines = File.read().split('\n')
         del lines[-1]
@@ -140,6 +160,10 @@ def guess_sents_uni(filename, freq, alpha, n_words):
     return count/len(good)
 
 def guess_sents_bi(filename, bi_freq, beta, uni_freq, alpha, n_words):
+    ''' Predicts the proper english sentence from improper 
+    sentence using bigram model. In the test file included 
+    in the package the a good sentence is on a single line
+    followed by the bad sentence on the next line '''
     with open(filename) as File:
         lines = File.read().split('\n')
         del lines[-1]
@@ -165,6 +189,10 @@ def guess_sents_bi(filename, bi_freq, beta, uni_freq, alpha, n_words):
     return count/len(good)
 
 def uni_script():
+    ''' Trains the model on the included texts and calculates probability
+    of testdata without optimizing alpha, and then again optimizing alpha
+    using held out data. Finally uses trained model to predict good from
+    bad sentences'''
     # filenames
     training = sys.argv[1]
     held_out = sys.argv[2]
@@ -189,6 +217,11 @@ def uni_script():
     print "Optimized alpha~ " + str(alpha)
 
 def bi_script():
+    ''' Trains the model on the included texts and calculates probability
+    of testdata without optimizing beta, and then again optimizing beta
+    using held out data. Uses hard coded alpha paremeter found using
+    uni_script.Finally uses trained model to predict good from
+    bad sentences'''
     # filenames
     training = sys.argv[1]
     held_out = sys.argv[2]
@@ -214,7 +247,7 @@ def bi_script():
     print "Optimized beta~ " + str(beta)
 
 def main():
-    
+    ''' Either runs uni_script or bi_script depending on inputs'''
     if sys.argv[5] == 'uni':
         uni_script()
     else:
