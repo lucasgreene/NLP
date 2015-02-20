@@ -1,0 +1,11 @@
+This folder contains a model for predicting good english from bad english using a bigram model with optimized smoothing parameters. Note: the optimized unigram smoothing parameter found using the unigram script is hard-coded in the bigram model (so you don't have to optimize twice in the bigram script which saves time)
+
+
+To use run:
+
+./unigram english-senate-0.txt english-senate-1.txt english-senate-2.txt good-bad
+
+./bigram english-senate-0.txt english-senate-1.txt english-senate-2.txt good-bad
+
+
+Note: both are a litte slow (the optmization might take 20-30s). I plan to clean the script up a bit later.
