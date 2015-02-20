@@ -1,6 +1,6 @@
 import sys
 import numpy as np
-"test"
+
 
 
 def get_bigrams(filename):
