@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+import cPickle as pickle
 
 
 
@@ -65,6 +66,16 @@ def bi_prob(bigrams, bi_freq, beta, uni_freq, n_words, alpha):
         prob += np.log((nb + beta*theta)/(no + beta))
     return prob * -1
 
+def pickle_bigrams(bi_freq, beta, uni_freq, n_words, alpha):
+    n_types = len(uni_freq)
+    pickledBigrams = {}
+    for bigram, value in bi_freq.iteritems():
+        nb = value
+        na = uni_freq[bigram[1]]
+        no = uni_freq[bigram[0]]
+        theta = (na + alpha)/(n_words + alpha*n_types)
+        pickledBigrams[bigram] = (nb + beta*theta)/(no + beta)
+    pickle.dump(pickledBigrams, open ("pickled_bigrams.p", "wb"))
 
 def uni_prob(toks, freq, alpha, n_words):
     ''' Using given alpha parameter calculates the probability
@@ -77,6 +88,8 @@ def uni_prob(toks, freq, alpha, n_words):
             prob += np.log((freq[gram] + alpha)/(n_words + alpha*n_types))
         else:
             prob += np.log((0. + alpha)/(n_words + alpha*n_types))
+    print "number of types: %s" %n_types
+    print "number of words: %s" %n_words
     return prob*-1
 
 def beta_opt(ho_toks, bi_freq, uni_freq, n_words, alpha):
@@ -233,12 +246,14 @@ def bi_script():
     bi_freq = bigram_counts(train_bigrams)
     # get unigram counts
     uni_freq = unigram_counts(train_toks)
+    pickle.dump(uni_freq, open('unigrams.p','wb'))
     # get test bigrams
     _, test_bigrams = get_bigrams(test)
     prob = bi_prob(test_bigrams, bi_freq, 1, uni_freq, len(train_toks), 1.599)
     print "Log probability with alpha = 1: " + str(prob)
     _, ho_bigrams = get_bigrams(held_out)
     beta = beta_opt(ho_bigrams, bi_freq, uni_freq, len(train_toks), 1.599)
+    pickle_bigrams(bi_freq, 113.07, uni_freq, len(train_toks), 1.599)
     opt_prob = bi_prob(test_bigrams, bi_freq, 113.07, uni_freq, len(train_toks), 1.599)
     print "Log probability with optimized beta and alpha: " + str(opt_prob)
     accuracy =  guess_sents_bi(good_bad, bi_freq, beta, uni_freq, 1.599, len(train_toks))
