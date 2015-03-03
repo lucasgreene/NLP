@@ -2,6 +2,8 @@ This is a French-English Machine translation program. It uses IBM model 1 and EM
 
 To run:
   verydumb french-senate-0.txt english-senate-0.txt french-senate-2.txt
+  
+
   fscore translated_french_1.txt english-senate-2.txt
 
   (takes around 10 minutes)
@@ -9,6 +11,8 @@ To run:
           OR
 
   noisychannel french-senate-0.txt english-senate-0.txt french-senate-2.txt
+ 
+
   fscore translated_french_2.txt english-senate-2.txt
 
   (takes around 45 minutes)
